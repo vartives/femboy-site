@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Website</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        #video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.3;
+            transition: all 1s ease-in-out;
+        }
+
+        #video-background.active {
+            filter: blur(0px);
+            opacity: 1;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: all 1s ease-in-out;
+        }
+
+        .overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .enter-text {
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            cursor: pointer;
+        }
+
+        .content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 1s ease-in-out 1s;
+        }
+
+        .content.visible {
+            opacity: 1;
+        }
+
+        .content h1 {
+            font-size: 64px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+        }
+
+        .content p {
+            font-size: 24px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .audio-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 20;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .audio-toggle.visible {
+            opacity: 1;
+        }
+
+        .audio-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Hintergrundvideo -->
+    <video id="video-background" loop>
+        <source src="https://github.com/vartives/femboy-site/raw/refs/heads/main/announcementtomake.mp4" type="video/mp4">
+        Ihr Browser unterstützt keine HTML5-Videos.
+    </video>
+
+    <!-- Overlay mit Enter Text -->
+    <div class="overlay" id="overlay">
+        <div class="enter-text" id="enterText">Click to Enter</div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video-background');
+        const overlay = document.getElementById('overlay');
+        const content = document.getElementById('content');
+        const enterText = document.getElementById('enterText');
+        // Initialer Zustand: Video ist stumm
+        video.muted = true;
+        let isMuted = true;
+
+        // Enter Text Click Event
+        enterText.addEventListener('click', function() {
+            // Video mit Sound abspielen (User-Interaktion erforderlich)
+            video.muted = false;
+            isMuted = false;
+            
+            video.play().then(() => {
+                overlay.classList.add('hidden');
+                video.classList.add('active');
+
+                setTimeout(() => {
+                    if(content) content.classList.add('visible');
+                }, 1000);
+                
+            }).catch(error => {
+                console.log('Video konnte nicht gestartet werden:', error);
+                overlay.classList.add('hidden');
+                video.classList.add('active');
+                audioToggle.classList.add('visible');
+                if(content) content.classList.add('visible');
+            });
+        });
+
+        // Video Loop sicherstellen
+        video.addEventListener('ended', function() {
+            video.currentTime = 0;
+            video.play();
+        });
+
+        // Preload Video
+        video.addEventListener('canplaythrough', function() {
+            console.log('Video ist bereit zum Abspielen');
+        });
+
+        video.addEventListener('error', function(e) {
+            console.log('Video Fehler:', e);
+            document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        });
+    </script>
+</body>
+</html>
